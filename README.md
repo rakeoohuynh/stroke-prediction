@@ -1,85 +1,85 @@
-# Stroke Prediction – Dự đoán đột quỵ
+# Stroke Prediction
 
-Capstone project phân tích dữ liệu y tế và xây dựng mô hình machine learning dự đoán nguy cơ đột quỵ (stroke) dựa trên thông tin bệnh nhân.
+A capstone project that analyzes healthcare data and builds machine learning models to predict a patient's risk of stroke.
 
-## Dữ liệu
+## Dataset
 
-File: [`data/healthcare-dataset-stroke-data.csv`](data/healthcare-dataset-stroke-data.csv) (Healthcare Stroke Dataset, ~5.100 bệnh nhân).
+File: [`data/healthcare-dataset-stroke-data.csv`](data/healthcare-dataset-stroke-data.csv) (Healthcare Stroke Dataset, ~5,100 patients).
 
-| Cột | Mô tả |
+| Column | Description |
 |---|---|
-| `id` | Mã bệnh nhân (bị loại bỏ khi huấn luyện) |
-| `gender` | Giới tính |
-| `age` | Tuổi |
-| `hypertension` | Huyết áp cao (0/1) |
-| `heart_disease` | Bệnh tim (0/1) |
-| `ever_married` | Đã kết hôn hay chưa |
-| `work_type` | Loại công việc |
-| `Residence_type` | Nơi ở (Urban/Rural) |
-| `avg_glucose_level` | Chỉ số đường huyết trung bình |
-| `bmi` | Chỉ số khối cơ thể |
-| `smoking_status` | Tình trạng hút thuốc |
-| `stroke` | **Nhãn cần dự đoán** (1 = đột quỵ) |
+| `id` | Patient ID (dropped before training) |
+| `gender` | Gender |
+| `age` | Age |
+| `hypertension` | Hypertension (0/1) |
+| `heart_disease` | Heart disease (0/1) |
+| `ever_married` | Marital status |
+| `work_type` | Type of work |
+| `Residence_type` | Residence (Urban/Rural) |
+| `avg_glucose_level` | Average glucose level |
+| `bmi` | Body mass index |
+| `smoking_status` | Smoking status |
+| `stroke` | **Target** (1 = stroke) |
 
-Chỉ có 249 bệnh nhân bị đột quỵ (4,87%), nên dữ liệu mất cân bằng nghiêm trọng.
+Only 249 patients had a stroke (4.87%), so the dataset is severely imbalanced.
 
-## Quy trình thực hiện
+## Workflow
 
-Toàn bộ nằm trong notebook [`stroke.ipynb`](stroke.ipynb):
+Everything is in the notebook [`stroke.ipynb`](stroke.ipynb):
 
-1. **Làm sạch dữ liệu**: điền giá trị thiếu của `bmi` bằng trung bình, bỏ dòng trùng lặp, bỏ cột `id`.
-2. **EDA**: phân tích tương quan, so sánh tuổi, đường huyết, BMI giữa nhóm đột quỵ và không đột quỵ.
-3. **Xử lý outlier**: giữ lại các dòng có `bmi` < 80.
-4. **Tiền xử lý**: bỏ `ever_married`, `Residence_type`, `work_type`; one-hot `smoking_status`; chia nhóm tuổi (0-17, 18-30, 31-50, 51-90); mã hóa `gender`.
-5. **Chia dữ liệu**: train/test 80/20, `stratify=y`.
-6. **Cân bằng lớp**: SMOTE chỉ áp dụng trên tập train, tập test giữ nguyên phân phối gốc.
-7. **Mô hình**: Logistic Regression và Random Forest (300 cây).
+1. **Data cleaning**: fill missing `bmi` values with the mean, drop duplicate rows, drop the `id` column.
+2. **EDA**: correlation analysis, comparing age, glucose and BMI between stroke and non-stroke groups.
+3. **Outlier handling**: keep rows with `bmi` < 80.
+4. **Preprocessing**: drop `ever_married`, `Residence_type` and `work_type`; one-hot encode `smoking_status`; bin age (0-17, 18-30, 31-50, 51-90); encode `gender`.
+5. **Split**: 80/20 train/test split with `stratify=y`.
+6. **Class balancing**: SMOTE applied to the training set only; the test set keeps its original distribution.
+7. **Models**: Logistic Regression and Random Forest (300 trees).
 
-## Kết quả EDA
+## EDA Findings
 
-| Yếu tố | Tương quan với đột quỵ |
+| Factor | Correlation with stroke |
 |---|---|
-| Tuổi | 0.245 |
-| Bệnh tim | 0.135 |
-| Đường huyết | 0.132 |
-| Huyết áp cao | 0.128 |
+| Age | 0.245 |
+| Heart disease | 0.135 |
+| Glucose level | 0.132 |
+| Hypertension | 0.128 |
 | BMI | 0.039 |
 
-Tuổi trung bình của bệnh nhân đột quỵ là **67,7**, trong khi tuổi trung bình toàn bộ dữ liệu là 43,2. Tuổi là yếu tố nguy cơ quan trọng nhất.
+The average age of stroke patients is **67.7**, compared with 43.2 across the whole dataset, making age the most important risk factor.
 
-## Kết quả mô hình
+## Model Results
 
-Đánh giá trên tập test gốc (972 không đột quỵ / 50 đột quỵ):
+Evaluated on the original test set (972 non-stroke / 50 stroke):
 
-| Chỉ số | Logistic Regression | Random Forest |
+| Metric | Logistic Regression | Random Forest |
 |---|---|---|
-| Recall (đột quỵ) | **24%** | 16% |
-| Precision (đột quỵ) | 11% | **17%** |
+| Recall (stroke) | **24%** | 16% |
+| Precision (stroke) | 11% | **17%** |
 | ROC-AUC | 0.742 | **0.780** |
 | Accuracy | 87% | 92% |
 
-Với dữ liệu mất cân bằng, accuracy dễ gây hiểu nhầm, nên cần xem Recall của lớp đột quỵ và ROC-AUC.
+With imbalanced data, accuracy can be misleading, so stroke-class recall and ROC-AUC are the metrics to watch.
 
-## Kết luận
+## Conclusion
 
-- Khi đánh giá đúng cách (chia train/test trước rồi mới SMOTE), cả hai mô hình vẫn còn yếu trong việc phát hiện đột quỵ.
-- Random Forest có ROC-AUC cao hơn, Logistic Regression có recall cao hơn nhưng vẫn bỏ sót phần lớn ca đột quỵ.
-- Hướng cải thiện: điều chỉnh ngưỡng quyết định, `class_weight`, thêm đặc trưng, cross-validation.
-- Mô hình chưa đủ tin cậy để dùng trong thực tế y tế.
+- When evaluated properly (split first, then apply SMOTE), both models are still weak at detecting strokes.
+- Random Forest has a higher ROC-AUC, while Logistic Regression has higher recall but still misses most stroke cases.
+- Possible improvements: tune the decision threshold, use `class_weight`, add features, apply cross-validation.
+- The models are not reliable enough for real-world medical use.
 
-## Cách chạy
+## Getting Started
 
 ```bash
 pip install pandas numpy matplotlib seaborn scikit-learn imbalanced-learn jupyter
 jupyter notebook stroke.ipynb
 ```
 
-## Cấu trúc thư mục
+## Project Structure
 
 ```
 stroke-prediction/
 ├── data/
-│   └── healthcare-dataset-stroke-data.csv   # dữ liệu
-├── stroke.ipynb                             # EDA + huấn luyện mô hình
+│   └── healthcare-dataset-stroke-data.csv   # dataset
+├── stroke.ipynb                             # EDA + model training
 └── README.md
 ```
