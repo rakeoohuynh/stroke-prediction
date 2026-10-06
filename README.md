@@ -4,7 +4,7 @@ Capstone project phân tích dữ liệu y tế và xây dựng mô hình machin
 
 ## Dữ liệu
 
-File: [`healthcare-dataset-stroke-data.csv`](healthcare-dataset-stroke-data.csv) (Healthcare Stroke Dataset, ~5.100 bệnh nhân).
+File: [`data/healthcare-dataset-stroke-data.csv`](data/healthcare-dataset-stroke-data.csv) (Healthcare Stroke Dataset, ~5.100 bệnh nhân).
 
 | Cột | Mô tả |
 |---|---|
@@ -77,9 +77,9 @@ jupyter notebook stroke.ipynb
 ## Cấu trúc thư mục
 
 ```
-capstone/
-├── healthcare-dataset-stroke-data.csv   # dữ liệu
-├── stroke.ipynb                         # EDA + huấn luyện mô hình
-├── st.py                                # app Streamlit (đang phát triển)
-└── helper.py
+stroke-prediction/
+├── data/
+│   └── healthcare-dataset-stroke-data.csv   # dữ liệu
+├── stroke.ipynb                             # EDA + huấn luyện mô hình
+└── README.md
 ```
